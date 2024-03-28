@@ -127,11 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="helper\debug.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="rat\rat.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="helper\log.h" />
     <ClInclude Include="rat\rat.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

